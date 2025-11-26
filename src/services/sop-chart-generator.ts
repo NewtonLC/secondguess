@@ -62,8 +62,8 @@ export class SOPChartGenerator {
         charts.push(swimlane);
       }
 
-      // Generate data flow diagram if there are inputs/outputs
-      if (input.inputs.length > 0 || input.outputs.length > 0) {
+      // Always generate data flow diagram if there are inputs or outputs
+      if ((input.inputs && input.inputs.length > 0) || (input.outputs && input.outputs.length > 0)) {
         const dataFlow = await this.generateDataFlow(input);
         charts.push(dataFlow);
       }
@@ -101,18 +101,20 @@ Requirements:
    - Diamond: nodeId{"Decision text?"}
    - Start/End: nodeId(["Label"])
 4. Use arrows: nodeId1 --> nodeId2
-5. Keep labels SHORT and simple (max 50 characters)
+5. Keep labels VERY SHORT (max 35 characters)
 6. NO special characters in labels except spaces and basic punctuation
 7. NO line breaks within labels
 8. Include start and end nodes
+9. Keep it COMPACT - max 10 nodes total
+10. Combine similar steps if needed to keep diagram focused
 
 Example format:
 flowchart TD
     start(["Start"])
-    step1["Process step"]
-    decision1{"Check condition?"}
-    step2["Action A"]
-    step3["Action B"]
+    step1["Gather data"]
+    decision1{"Valid?"}
+    step2["Process"]
+    step3["Reject"]
     end1(["End"])
     
     start --> step1
@@ -158,30 +160,35 @@ ${input.steps.map((step, i) => `${i + 1}. ${step.description || step.title || st
 
 Requirements:
 1. Use ONLY Mermaid flowchart syntax: flowchart TD
-2. Use subgraph for each actor/role
-3. Simple node IDs without spaces
-4. Short labels (max 40 characters)
-5. Use this syntax:
-   - subgraph ActorName
+2. Use subgraph for EACH actor/role as a swimlane
+3. Each subgraph represents ONE actor's lane
+4. Simple node IDs without spaces (e.g., a1, a2, b1, b2)
+5. Short labels (max 35 characters)
+6. Use this EXACT syntax:
+   - subgraph "Actor Name"
+   - direction TB
    - nodeId["Action"]
    - end
-6. Connect nodes across subgraphs with arrows
+7. Connect nodes across subgraphs with arrows
+8. Keep it COMPACT - max 8 steps total
 
 Example format:
 flowchart TD
-    subgraph Actor1
-        a1["Step 1"]
-        a2["Step 2"]
+    subgraph "Manager"
+        direction TB
+        a1["Review request"]
+        a2["Make decision"]
     end
     
-    subgraph Actor2
-        b1["Step 3"]
-        b2["Step 4"]
+    subgraph "Employee"
+        direction TB
+        b1["Submit request"]
+        b2["Receive feedback"]
     end
     
+    b1 --> a1
     a1 --> a2
-    a2 --> b1
-    b1 --> b2
+    a2 --> b2
 
 Return ONLY valid Mermaid code, no explanations.`;
 
@@ -193,10 +200,10 @@ Return ONLY valid Mermaid code, no explanations.`;
 
     return {
       type: 'swimlane',
-      title: 'Responsibility Matrix',
-      description: 'Process flow showing responsibilities across different roles',
+      title: 'Roles and Responsibilities',
+      description: 'Swimlane diagram showing which role performs each step',
       mermaidCode,
-      caption: `Figure 2: ${input.title} - Swimlane Diagram`
+      caption: `Figure 2: ${input.title} - Roles and Responsibilities`
     };
   }
 
@@ -214,33 +221,39 @@ INPUTS:
 ${input.inputs.map((inp, i) => `${i + 1}. ${inp.name || inp}${inp.description ? `: ${inp.description}` : ''}`).join('\n')}
 
 PROCESS STEPS:
-${input.steps.map((step, i) => `${i + 1}. ${step.description || step.title || step}`).join('\n')}
+${input.steps.slice(0, 5).map((step, i) => `${i + 1}. ${step.description || step.title || step}`).join('\n')}
 
 OUTPUTS:
 ${input.outputs.map((out, i) => `${i + 1}. ${out.name || out}${out.description ? `: ${out.description}` : ''}`).join('\n')}
 
 Requirements:
 1. Use ONLY Mermaid flowchart syntax: flowchart LR
-2. Simple node IDs without spaces
-3. Short labels (max 40 characters)
-4. Use this syntax:
-   - Input: inp1[/"Input name"/]
-   - Process: proc1["Process"]
-   - Output: out1[\"Output name"\]
+2. Simple node IDs without spaces (inp1, proc1, out1, etc.)
+3. VERY SHORT labels (max 25 characters)
+4. Use this EXACT syntax:
+   - Input nodes: inp1[/"Input name"/]
+   - Process nodes: proc1["Process step"]
+   - Output nodes: out1[\"Output name"\]
 5. Flow left to right: inputs --> process --> outputs
+6. Keep it SIMPLE - max 3 inputs, 3 processes, 3 outputs
+7. Group multiple similar items into one node if needed
 
 Example format:
 flowchart LR
-    inp1[/"Input A"/]
-    inp2[/"Input B"/]
-    proc1["Process"]
-    out1[\"Output X"\]
+    inp1[/"Customer Data"/]
+    inp2[/"Requirements"/]
+    proc1["Validate"]
+    proc2["Process"]
+    out1[\"Report"\]
+    out2[\"Notification"\]
     
     inp1 --> proc1
     inp2 --> proc1
-    proc1 --> out1
+    proc1 --> proc2
+    proc2 --> out1
+    proc2 --> out2
 
-Return ONLY valid Mermaid code, no explanations.`;
+Return ONLY valid Mermaid code, no explanations or markdown.`;
 
     const result = await this.model.generateContent(prompt);
     const response = await result.response;
@@ -250,10 +263,10 @@ Return ONLY valid Mermaid code, no explanations.`;
 
     return {
       type: 'flowchart',
-      title: 'Data Flow Diagram',
-      description: 'Flow of data through the process from inputs to outputs',
+      title: 'Input-Process-Output Diagram',
+      description: 'Shows the flow of information from inputs through processing to outputs',
       mermaidCode,
-      caption: `Figure 3: ${input.title} - Data Flow Diagram`
+      caption: `Figure 3: ${input.title} - Input-Process-Output Flow`
     };
   }
 

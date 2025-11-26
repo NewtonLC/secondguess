@@ -30,6 +30,7 @@ interface ExtendedSessionState extends ConversationSessionState {
   userChoices: Record<string, any>;
   contextData: SessionContext;
   persistenceKey?: string;
+  userInteractionCount: number; // Track number of user interactions
 }
 
 interface SessionContext {
@@ -129,7 +130,8 @@ export class ConversationManagerService implements ConversationManager {
         lastSaveTime: now,
         preferences: { ...defaultPreferences, ...preferences }
       },
-      persistenceKey: `persist-${sessionId}`
+      persistenceKey: `persist-${sessionId}`,
+      userInteractionCount: 0 // Initialize interaction counter
     };
 
     this.sessions.set(sessionId, initialSession);
@@ -156,6 +158,7 @@ export class ConversationManagerService implements ConversationManager {
     // Update session activity
     session.lastActivity = new Date();
     session.conversationHistory.push(input);
+    session.userInteractionCount++; // Increment interaction counter
 
     // Process input based on current conversation phase
     const response = await this.orchestrateConversationFlow(session, input, sessionId);
@@ -213,29 +216,29 @@ export class ConversationManagerService implements ConversationManager {
       
       const nextQuestion = aiSummary.suggestedNextQuestions && aiSummary.suggestedNextQuestions.length > 0
         ? aiSummary.suggestedNextQuestions[0]
-        : "Please continue with more details about the process, including the steps involved, inputs needed, and expected outputs.";
+        : "Please provide a comprehensive description including: the complete sequence of steps from start to finish, who is responsible for each step, what inputs and resources are needed, what outputs are produced, any dependencies or prerequisites, and how exceptions or errors are handled.";
       
       return {
         message: `Thank you for starting to describe your workflow. ${aiSummary.description}\n\n${nextQuestion}`,
         requiresConfirmation: false,
         suggestedActions: aiSummary.suggestedNextQuestions?.slice(0, 3) || [
-          'Describe the main steps',
-          'Explain inputs and outputs',
-          'Mention any dependencies'
+          'Describe complete process flow',
+          'Explain roles and responsibilities',
+          'Detail inputs, outputs, and dependencies'
         ],
         shouldReadAloud: true,
         nextState: ConversationState.GATHERING_DETAILS
       };
     } catch (error) {
       logger.error('Failed to generate AI response in initialization:', error);
-      // Fallback to basic response
+      // Fallback to comprehensive question
       return {
-        message: "Thank you for starting to describe your workflow. Please continue with more details about the process, including the steps involved, inputs needed, and expected outputs.",
+        message: "Thank you for starting to describe your workflow. To create a comprehensive SOP, please provide: the complete sequence of steps from start to finish, who is responsible for each step, what inputs and resources are needed, what outputs are produced, any dependencies or prerequisites, and how exceptions or errors are handled.",
         requiresConfirmation: false,
         suggestedActions: [
-          'Describe the main steps',
-          'Explain inputs and outputs',
-          'Mention any dependencies'
+          'Describe complete process flow',
+          'Explain roles and responsibilities',
+          'Detail inputs, outputs, and dependencies'
         ],
         shouldReadAloud: true,
         nextState: ConversationState.GATHERING_DETAILS
@@ -255,6 +258,11 @@ export class ConversationManagerService implements ConversationManager {
     const aiSummary = await this.generateAISummary(sessionId, session);
     session.summaryHistory.push(aiSummary);
 
+    // Check if we've reached the 4th user interaction
+    if (session.userInteractionCount === 4) {
+      return this.handleFourthInteractionCheckpoint(session, aiSummary);
+    }
+
     // Check if we've reached the iteration limit
     if (session.iterationCount >= this.ITERATION_LIMIT) {
       return this.handleIterationCheckpoint(session);
@@ -263,7 +271,7 @@ export class ConversationManagerService implements ConversationManager {
     // Use AI-generated questions if available
     const nextQuestion = aiSummary.suggestedNextQuestions && aiSummary.suggestedNextQuestions.length > 0
       ? aiSummary.suggestedNextQuestions[0]
-      : "That's all or is there something missing?";
+      : "Is there anything else I should know about this process?";
 
     return {
       message: `${aiSummary.description}\n\n${nextQuestion}`,
@@ -289,6 +297,11 @@ export class ConversationManagerService implements ConversationManager {
     // Generate AI-powered summary
     const aiSummary = await this.generateAISummary(sessionId, session);
     session.summaryHistory.push(aiSummary);
+
+    // Check if we've reached the 4th user interaction
+    if (session.userInteractionCount === 4) {
+      return this.handleFourthInteractionCheckpoint(session, aiSummary);
+    }
 
     // Check iteration limit
     if (session.iterationCount >= this.ITERATION_LIMIT) {
@@ -450,6 +463,63 @@ export class ConversationManagerService implements ConversationManager {
         iterationCount: session.iterationCount
       }
     };
+  }
+
+  private handleFourthInteractionCheckpoint(session: ExtendedSessionState, aiSummary: any): ConversationResponse {
+    const summaryText = this.buildComprehensiveSummary(session, aiSummary);
+    
+    return {
+      message: `Let me summarize what we've discussed so far:\n\n${summaryText}\n\nWould you like to take more time to elaborate on any details, or are you ready to proceed with generating the SOP?`,
+      requiresConfirmation: true,
+      suggestedActions: [
+        'Add more details',
+        'Proceed with SOP generation',
+        'Review and refine'
+      ],
+      shouldReadAloud: true,
+      nextState: ConversationState.VALIDATION,
+      metadata: {
+        isCheckpoint: true,
+        interactionCount: session.userInteractionCount,
+        completeness: aiSummary.completenessScore || session.workflowCompleteness
+      }
+    };
+  }
+
+  private buildComprehensiveSummary(session: ExtendedSessionState, aiSummary: any): string {
+    const parts: string[] = [];
+    
+    // Add workflow title
+    if (session.workflowData.title) {
+      parts.push(`**Workflow**: ${session.workflowData.title}`);
+    }
+    
+    // Add description
+    if (aiSummary.description) {
+      parts.push(`\n**Summary**: ${aiSummary.description}`);
+    }
+    
+    // Add key steps
+    if (aiSummary.keySteps && aiSummary.keySteps.length > 0) {
+      parts.push(`\n**Key Steps**:\n${aiSummary.keySteps.map((step: string, i: number) => `${i + 1}. ${step}`).join('\n')}`);
+    }
+    
+    // Add inputs
+    if (aiSummary.identifiedInputs && aiSummary.identifiedInputs.length > 0) {
+      parts.push(`\n**Inputs**: ${aiSummary.identifiedInputs.join(', ')}`);
+    }
+    
+    // Add outputs
+    if (aiSummary.identifiedOutputs && aiSummary.identifiedOutputs.length > 0) {
+      parts.push(`\n**Outputs**: ${aiSummary.identifiedOutputs.join(', ')}`);
+    }
+    
+    // Add missing information
+    if (aiSummary.missingInformation && aiSummary.missingInformation.length > 0) {
+      parts.push(`\n**Missing Information**: ${aiSummary.missingInformation.join(', ')}`);
+    }
+    
+    return parts.join('\n');
   }
 
   // Workflow Information Gathering Logic

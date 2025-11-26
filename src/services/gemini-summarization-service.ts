@@ -86,6 +86,7 @@ export class GeminiSummarizationService {
       .join('\n');
 
     const feedbackContext = this.buildFeedbackContext(sessionId);
+    const interactionCount = conversationHistory.length;
 
     return `You are an AI assistant helping to create Standard Operating Procedures (SOPs). 
 Your task is to analyze the conversation history and generate a comprehensive workflow summary.
@@ -99,6 +100,8 @@ CURRENT WORKFLOW DATA:
 - Steps: ${workflowData.steps?.length || 0} identified
 - Inputs: ${workflowData.inputs?.length || 0} identified
 - Outputs: ${workflowData.outputs?.length || 0} identified
+
+INTERACTION COUNT: ${interactionCount}
 
 ${feedbackContext}
 
@@ -123,9 +126,22 @@ COMPLETENESS SCORE:
 [Provide a score from 0-100 indicating how complete the workflow description is]
 
 NEXT QUESTIONS:
-[Suggest 2-3 specific questions to ask the user to fill gaps or clarify ambiguities]
+[Suggest 2-3 DETAILED, SPECIFIC questions that will gather comprehensive information to reduce back-and-forth. 
+Ask questions that encourage the user to provide multiple details at once. For example:
+- Instead of "What are the inputs?", ask "What are all the inputs, data sources, documents, and resources needed for this process, and where do they come from?"
+- Instead of "What happens next?", ask "Can you describe the complete sequence of steps from start to finish, including who is responsible for each step and what triggers the next action?"
+- Focus on gathering complete information about roles, responsibilities, timing, conditions, exceptions, and dependencies in a single question.]
 
-Be specific, actionable, and focus on creating a clear, implementable workflow.`;
+IMPORTANT GUIDELINES:
+1. Ask comprehensive questions that gather multiple related details at once
+2. Encourage the user to think holistically about the entire process
+3. Request specific examples, edge cases, and exception handling
+4. Ask about roles, responsibilities, timing, and decision criteria together
+5. Reduce the need for follow-up questions by being thorough upfront
+
+Be specific, actionable, and focus on creating a clear, implementable workflow.
+
+At the end of your response, add: "Am I missing something important?"`;
   }
 
   /**
@@ -153,7 +169,8 @@ Be specific, actionable, and focus on creating a clear, implementable workflow.`
 The user has provided the following feedback on previous summaries:
 - ${feedbackText}
 
-Please take this feedback into account when generating the new summary.`;
+Please take this feedback into account when generating the new summary. And 
+remember to add the question: Am I missing something?`;
   }
 
   /**

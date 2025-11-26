@@ -99,63 +99,63 @@ ${input.risks && input.risks.length > 0 ? `IDENTIFIED RISKS:\n${input.risks.map(
 
 Create a complete SOP document following ISO 9001 structure with these sections:
 
-1. PURPOSE
+### PURPOSE
    - Clear statement of why this SOP exists
    - Scope of application
    - Benefits and objectives
 
-2. SCOPE
+### SCOPE
    - What is covered by this SOP
    - What is NOT covered
    - Applicable departments/areas
 
-3. DEFINITIONS AND ABBREVIATIONS
+### DEFINITIONS AND ABBREVIATIONS
    - Key terms used in the document
    - Acronyms and their meanings
    - Technical terminology
 
-4. RESPONSIBILITIES
+### RESPONSIBILITIES
    - Roles and their specific responsibilities
    - Authority levels
    - Accountability matrix
 
-5. PROCEDURE
+### PROCEDURE
    - Detailed step-by-step instructions
    - Prerequisites for each step
    - Expected outcomes
    - Decision points and criteria
    - Quality checkpoints
 
-6. REQUIRED RESOURCES
+### REQUIRED RESOURCES
    - Materials and supplies
    - Equipment and tools
    - Personnel requirements
    - Information systems
 
-7. DOCUMENTATION AND RECORDS
+### DOCUMENTATION AND RECORDS
    - Forms to be completed
    - Records to be maintained
    - Retention periods
    - Storage requirements
 
-8. QUALITY CONTROL
+### QUALITY CONTROL
    - Quality standards
    - Inspection points
    - Acceptance criteria
    - Non-conformance handling
 
-9. SAFETY AND COMPLIANCE
+### SAFETY AND COMPLIANCE
    - Safety precautions
    - Regulatory requirements
    - Environmental considerations
    - Risk mitigation measures
 
-10. REFERENCES
+### REFERENCES
     - Related SOPs
     - Regulatory standards
     - Supporting documents
 
-11. REVISION HISTORY
+### REVISION HISTORY
     - Version tracking
     - Change log
 
@@ -163,13 +163,16 @@ Requirements:
 - Use professional, clear, and concise language
 - Write in imperative mood for procedures (e.g., "Complete the form", not "The form should be completed")
 - Include specific details and avoid ambiguity
-- Use numbered lists for sequential steps
-- Use bullet points for non-sequential items
+- Use numbered lists for sequential steps (1. 2. 3.)
+- Use bullet points for non-sequential items (use - not *)
 - Maintain consistent formatting
 - Include quality checkpoints
 - Address potential issues and their solutions
+- DO NOT add numbers before section titles - they will be added automatically
+- Use "###" for main section titles (without numbers)
+- Use "####" for subsection titles (without numbers)
 
-Format your response as structured sections with clear headings. Use "###" for section titles and "####" for subsection titles.`;
+Format your response as structured sections with clear headings. Use "###" for section titles and "####" for subsection titles. DO NOT include section numbers in the headings.`;
   }
 
   /**
@@ -187,13 +190,19 @@ Format your response as structured sections with clear headings. Use "###" for s
     for (const line of lines) {
       const trimmedLine = line.trim();
       
-      // Main section (### Title)
+      // Main section (### Title or ### 1. Title)
       if (trimmedLine.startsWith('###') && !trimmedLine.startsWith('####')) {
         if (currentSection) {
           sections.push(currentSection);
         }
         
-        const title = trimmedLine.replace(/^###\s*/, '').replace(/^\d+\.\s*/, '').trim();
+        // Remove ### and any existing numbering
+        const title = trimmedLine
+          .replace(/^###\s*/, '')
+          .replace(/^\d+\.\s*/, '')
+          .replace(/^\d+\s+/, '')
+          .trim();
+        
         currentSection = {
           number: `${sectionNumber}`,
           title,
@@ -204,10 +213,16 @@ Format your response as structured sections with clear headings. Use "###" for s
         subsectionNumber = 1;
         currentSubsection = null;
       }
-      // Subsection (#### Title)
+      // Subsection (#### Title or #### 1.1 Title)
       else if (trimmedLine.startsWith('####')) {
         if (currentSection) {
-          const title = trimmedLine.replace(/^####\s*/, '').replace(/^\d+\.\d+\s*/, '').trim();
+          // Remove #### and any existing numbering
+          const title = trimmedLine
+            .replace(/^####\s*/, '')
+            .replace(/^\d+\.\d+\s*/, '')
+            .replace(/^\d+\.\d+\.\s*/, '')
+            .trim();
+          
           currentSubsection = {
             number: `${currentSection.number}.${subsectionNumber}`,
             title,
