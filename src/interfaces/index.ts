@@ -1,6 +1,7 @@
 // Core interfaces for the AI Voice SOP Agent system
 export * from './voice-user-interface';
 export * from './speech-to-text-service';
+export * from './speech-to-text-adapter';
 export * from './conversation-manager';
 export * from './sop-generator';
 export * from './visual-generator';
