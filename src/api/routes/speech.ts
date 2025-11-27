@@ -3,6 +3,7 @@
  */
 
 import { Router, Request, Response } from 'express';
+import { authenticateUser } from '../middleware/auth';
 import { SpeechService } from '@/services/speech-service';
 import { logger } from '@/utils/logger';
 
@@ -12,8 +13,9 @@ const speechService = new SpeechService();
 /**
  * POST /api/speech/transcribe
  * Transcribe audio to text
+ * Requires authentication to prevent unauthorized resource consumption
  */
-router.post('/transcribe', async (req: Request, res: Response): Promise<void> => {
+router.post('/transcribe', authenticateUser, async (req: Request, res: Response): Promise<void> => {
   try {
     const { audioData, format, sampleRate, channels } = req.body;
 
