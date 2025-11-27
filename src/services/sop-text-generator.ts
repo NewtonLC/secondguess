@@ -99,77 +99,150 @@ ${input.risks && input.risks.length > 0 ? `IDENTIFIED RISKS:\n${input.risks.map(
 
 Create a complete SOP document following ISO 9001 structure with these sections:
 
-1. PURPOSE
+### PURPOSE
    - Clear statement of why this SOP exists
    - Scope of application
    - Benefits and objectives
 
-2. SCOPE
+### SCOPE
    - What is covered by this SOP
    - What is NOT covered
    - Applicable departments/areas
 
-3. DEFINITIONS AND ABBREVIATIONS
+### DEFINITIONS AND ABBREVIATIONS
    - Key terms used in the document
    - Acronyms and their meanings
    - Technical terminology
 
-4. RESPONSIBILITIES
+### RESPONSIBILITIES
    - Roles and their specific responsibilities
    - Authority levels
    - Accountability matrix
 
-5. PROCEDURE
-   - Detailed step-by-step instructions
-   - Prerequisites for each step
-   - Expected outcomes
-   - Decision points and criteria
-   - Quality checkpoints
+### PROCEDURE
+   CRITICAL FORMATTING REQUIREMENTS:
+   - Main steps MUST use format: "1. Step Title - Brief description" (ALL on ONE LINE)
+   - Number, title, dash, and description MUST be on ONE LINE (no line breaks)
+   - Related sub-steps MUST use indented sub-numbering: "   1.1", "   1.2", "   1.3" with 3 spaces indent
+   - Sub-steps are additional details, warnings, or notes for the main step
+   - Each sub-step on its own line with proper indentation and numbering
+   
+   EXACT FORMAT TO FOLLOW (copy this exactly):
+   
+1. Prepare Materials - Gather all required materials and tools
+   1.1 Check material quality and expiration dates
+   1.2 Verify quantities match requirements
+   1.3 Organize materials in work area
 
-6. REQUIRED RESOURCES
+2. Execute Process - Follow the documented procedure
+   2.1 Monitor progress at each checkpoint
+   2.2 Record observations and measurements
+   2.3 Address any deviations immediately
+
+3. Complete Documentation - Record all results and observations
+   3.1 Fill out required forms
+   3.2 Sign and date all documents
+   3.3 File records in appropriate location
+
+### REQUIRED RESOURCES
    - Materials and supplies
    - Equipment and tools
    - Personnel requirements
    - Information systems
 
-7. DOCUMENTATION AND RECORDS
+### DOCUMENTATION AND RECORDS
    - Forms to be completed
    - Records to be maintained
    - Retention periods
    - Storage requirements
 
-8. QUALITY CONTROL
-   - Quality standards
-   - Inspection points
-   - Acceptance criteria
-   - Non-conformance handling
+### QUALITY CONTROL
+   CRITICAL FORMATTING FOR QUALITY CONTROL:
+   - Main quality items use bullet points (-)
+   - Sub-items MUST be indented with 3 spaces and use different bullet (•)
+   
+   EXACT FORMAT TO FOLLOW:
+   
+- Quality standards and specifications
+   • Detailed specification 1
+   • Detailed specification 2
+- Inspection points and checkpoints
+   • Checkpoint 1 details
+   • Checkpoint 2 details
+- Acceptance criteria
+   • Criteria 1
+   • Criteria 2
+- Non-conformance handling procedures
+   • Step 1 for handling issues
+   • Step 2 for handling issues
 
-9. SAFETY AND COMPLIANCE
+### SAFETY AND COMPLIANCE
    - Safety precautions
    - Regulatory requirements
    - Environmental considerations
    - Risk mitigation measures
 
-10. REFERENCES
+### REFERENCES
     - Related SOPs
     - Regulatory standards
     - Supporting documents
 
-11. REVISION HISTORY
-    - Version tracking
-    - Change log
+### REVISION HISTORY
+    - Create a table with columns: Version, Date, Description, Author
+    - Add ONE row: Version 1.0, today's date (${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}), Initial release, AI Voice SOP Agent
+    - Use markdown table format
 
 Requirements:
 - Use professional, clear, and concise language
 - Write in imperative mood for procedures (e.g., "Complete the form", not "The form should be completed")
 - Include specific details and avoid ambiguity
-- Use numbered lists for sequential steps
-- Use bullet points for non-sequential items
-- Maintain consistent formatting
-- Include quality checkpoints
-- Address potential issues and their solutions
 
-Format your response as structured sections with clear headings. Use "###" for section titles and "####" for subsection titles.`;
+CRITICAL FORMATTING RULES (MUST FOLLOW EXACTLY):
+
+1. SECTION HEADERS:
+   - Format: "### Section Title" (ONE line, NO numbers, NO line breaks)
+   - Example: "### PURPOSE" NOT "### 1. PURPOSE" or "###\nPURPOSE"
+   - All headers must have consistent spacing (one blank line before and after)
+
+2. PROCEDURE SECTION NUMBERING:
+   - Main steps: "1. Step Title - Brief description" (ALL on ONE line)
+   - Sub-steps: "   1.1 Sub-step description" (3 spaces indent, sub-number, description)
+   - Format example:
+   
+1. Prepare Materials - Gather all required materials and tools
+   1.1 Check material quality and expiration dates
+   1.2 Verify quantities match requirements
+   1.3 Organize materials in work area
+
+2. Execute Process - Follow the documented procedure
+   2.1 Monitor progress at each checkpoint
+   2.2 Record observations and measurements
+   2.3 Address any deviations immediately
+
+3. QUALITY CONTROL BULLETS:
+   - Main items: "- Main quality item"
+   - Sub-items: "   • Sub-item detail" (3 spaces indent, bullet •)
+   - Format example:
+   
+- Quality standards and specifications
+   • Detailed specification 1
+   • Detailed specification 2
+- Inspection points and checkpoints
+   • Checkpoint 1 details
+   • Checkpoint 2 details
+
+4. OTHER SECTIONS:
+   - Use bullet points (- not *) for non-sequential items
+   - Use numbered lists (1. 2. 3.) only in PROCEDURE section
+   - Maintain consistent formatting throughout
+
+5. SPACING:
+   - One blank line before each section header
+   - One blank line after each section header
+   - NO extra line breaks within headers
+   - Consistent margins for all sections
+
+Format your response as structured sections with clear headings. Use "###" for section titles and "####" for subsection titles. DO NOT include section numbers in the headings. Keep all headers on a single line with NO line breaks.`;
   }
 
   /**
@@ -181,19 +254,26 @@ Format your response as structured sections with clear headings. Use "###" for s
     
     let currentSection: SOPSection | null = null;
     let currentSubsection: SOPSection | null = null;
-    let sectionNumber = 1;
+    let sectionNumber = 2; // Start from 2 since Process Diagrams will be section 1
     let subsectionNumber = 1;
 
     for (const line of lines) {
       const trimmedLine = line.trim();
       
-      // Main section (### Title)
+      // Main section (### Title or ### 1. Title)
       if (trimmedLine.startsWith('###') && !trimmedLine.startsWith('####')) {
         if (currentSection) {
           sections.push(currentSection);
         }
         
-        const title = trimmedLine.replace(/^###\s*/, '').replace(/^\d+\.\s*/, '').trim();
+        // Remove ### and any existing numbering, also remove line breaks
+        const title = trimmedLine
+          .replace(/^###\s*/, '')
+          .replace(/^\d+\.\s*/, '')
+          .replace(/^\d+\s+/, '')
+          .replace(/\n/g, ' ')
+          .trim();
+        
         currentSection = {
           number: `${sectionNumber}`,
           title,
@@ -204,10 +284,17 @@ Format your response as structured sections with clear headings. Use "###" for s
         subsectionNumber = 1;
         currentSubsection = null;
       }
-      // Subsection (#### Title)
+      // Subsection (#### Title or #### 1.1 Title)
       else if (trimmedLine.startsWith('####')) {
         if (currentSection) {
-          const title = trimmedLine.replace(/^####\s*/, '').replace(/^\d+\.\d+\s*/, '').trim();
+          // Remove #### and any existing numbering, also remove line breaks
+          const title = trimmedLine
+            .replace(/^####\s*/, '')
+            .replace(/^\d+\.\d+\s*/, '')
+            .replace(/^\d+\.\d+\.\s*/, '')
+            .replace(/\n/g, ' ')
+            .trim();
+          
           currentSubsection = {
             number: `${currentSection.number}.${subsectionNumber}`,
             title,

@@ -348,7 +348,7 @@
             width: 100%;
             min-height: 60px;
             max-height: 200px;
-            padding: 0.75rem 3.5rem 0.75rem 1rem;
+            padding: 0.75rem 12rem 0.75rem 1rem;
             border: 2px solid #e5e7eb;
             border-radius: 12px;
             font-family: inherit;
@@ -357,6 +357,7 @@
             overflow-y: auto;
             transition: border-color 0.2s;
             line-height: 1.5;
+            position: relative;
         }
 
         .input-box:focus {
@@ -369,9 +370,6 @@
         }
 
         .send-button {
-            position: absolute;
-            right: 1.25rem;
-            bottom: 0.75rem;
             width: 36px;
             height: 36px;
             border: none;
@@ -398,6 +396,135 @@
 
         .send-button.loading {
             background: #9ca3af;
+        }
+
+        /* Button Group */
+        .button-group {
+            position: absolute;
+            right: 1.25rem;
+            bottom: 0.75rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        /* Microphone Button */
+        .mic-button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .mic-button .mic-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .mic-button.recording {
+            background: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        .mic-button.recording .mic-icon {
+            animation: micPulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+
+        @keyframes micPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .recording-indicator {
+            display: none;
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .mic-button.recording .recording-indicator {
+            display: block;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Voice Wave Animation */
+        .voice-wave {
+            display: none;
+            position: absolute;
+            right: 7rem;
+            bottom: 0.75rem;
+            height: 36px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 6px 10px;
+            align-items: center;
+            gap: 3px;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .voice-wave.active {
+            display: flex;
+        }
+
+        .wave-bar {
+            width: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            height: 10px;
+            transition: height 0.1s ease-out;
+        }
+
+        /* Animation when recording */
+        .voice-wave.active .wave-bar {
+            animation: wave 0.8s ease-in-out infinite;
+        }
+
+        .voice-wave.active .wave-bar:nth-child(1) { animation-delay: 0s; }
+        .voice-wave.active .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-wave.active .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-wave.active .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-wave.active .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { height: 10px; }
+            50% { height: 24px; }
         }
 
         /* Loading Spinner */
@@ -610,9 +737,9 @@
         <div class="header-content">
             <div class="logo">🎙️ AI Voice SOP Agent</div>
             <div class="nav-links">
-                <a href="/new" class="nav-link">🏠 Home</a>
-                <a href="/dashboard" class="nav-link">📈 System Dashboard</a>
-                <a href="/api-dashboard-new.html" class="nav-link">🔍 API Logs</a>
+                <a href="/new" class="nav-link" target="_blank" rel="noopener noreferrer">🏠 Home</a>
+                <a href="/dashboard" class="nav-link" target="_blank" rel="noopener noreferrer">📈 System Dashboard</a>
+                <a href="/api-dashboard-new.html" class="nav-link" target="_blank" rel="noopener noreferrer">🔍 API Logs</a>
             </div>
         </div>
     </div>
@@ -649,14 +776,8 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons" id="action-buttons" style="display: none;">
-            <button class="action-btn" onclick="startNewSession()">
-                🔄 New Session
-            </button>
             <button class="action-btn primary" onclick="generateSOP()" id="generate-btn" disabled>
                 📋 Generate SOP
-            </button>
-            <button class="action-btn" onclick="startVoiceConversation()" id="voice-btn">
-                🎤 Voice Input
             </button>
         </div>
 
@@ -673,6 +794,9 @@
                 <button class="action-btn" onclick="exportSOP('docx')" id="export-docx-btn">
                     📝 Export Word
                 </button>
+                <button class="action-btn" onclick="exportSOP('md')" id="export-md-btn">
+                    🤖 Export Agent.MD
+                </button>
             </div>
         </div>
     </div>
@@ -683,14 +807,24 @@
             <textarea 
                 id="message-input" 
                 class="input-box" 
-                placeholder="Describe your workflow or process..."
+                placeholder="Describe your workflow or process... (or use voice 🎤)"
                 rows="10"
                 onkeydown="handleKeyPress(event)"
             ></textarea>
-            <button class="send-button" id="send-button" onclick="sendMessage()" disabled>
-                <span class="send-icon">➤</span>
-                <div class="spinner"></div>
-            </button>
+            <div class="button-group">
+                <button class="mic-button" id="mic-button" onclick="toggleVoiceRecording()" title="Voice input">
+                    <svg class="mic-icon" id="mic-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                    </svg>
+                    <div class="recording-indicator" id="recording-indicator"></div>
+                </button>
+                <button class="send-button" id="send-button" onclick="sendMessage()" disabled>
+                    <span class="send-icon">➤</span>
+                    <div class="spinner"></div>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -700,6 +834,17 @@
         let conversationHistory = [];
         let authToken = null;
         let isProcessing = false;
+        
+        // Voice recording state
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordingStartTime = null;
+        let recordingTimer = null;
+        let audioContext = null;
+        let analyser = null;
+        let animationFrame = null;
+        let waveElement = null;
 
         const API_BASE = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000/api' 
@@ -1047,6 +1192,28 @@
             });
         }
 
+        // Clean bullet characters from list items
+        function cleanBulletText(text) {
+            if (!text) return '';
+            // Remove leading bullet characters and numbers multiple times to catch nested markers
+            let cleaned = text.trim();
+            
+            // Keep removing leading markers until none are left
+            let previousLength = 0;
+            while (cleaned.length !== previousLength) {
+                previousLength = cleaned.length;
+                // Remove: -, *, •, ·, ◦, ▪, ▫, numbers with dots, and colons after numbers
+                cleaned = cleaned
+                    .replace(/^[\-\*•·◦▪▫]\s*/, '')
+                    .replace(/^\d+\.\s*/, '')
+                    .replace(/^\d+:\s*/, '')
+                    .replace(/^[:\.\s]+/, '')
+                    .trim();
+            }
+            
+            return cleaned;
+        }
+
         // Format AI response with structured blocks
         function formatAIResponse(content, metadata) {
             const container = document.createElement('div');
@@ -1073,7 +1240,7 @@
                     const stepsList = document.createElement('ul');
                     summary.keySteps.forEach(step => {
                         const li = document.createElement('li');
-                        li.textContent = step;
+                        li.textContent = cleanBulletText(step);
                         stepsList.appendChild(li);
                     });
                     stepsBlock.appendChild(stepsList);
@@ -1086,7 +1253,7 @@
                     const inputsList = document.createElement('ul');
                     summary.identifiedInputs.forEach(input => {
                         const li = document.createElement('li');
-                        li.textContent = input;
+                        li.textContent = cleanBulletText(input);
                         inputsList.appendChild(li);
                     });
                     inputsBlock.appendChild(inputsList);
@@ -1099,7 +1266,7 @@
                     const outputsList = document.createElement('ul');
                     summary.identifiedOutputs.forEach(output => {
                         const li = document.createElement('li');
-                        li.textContent = output;
+                        li.textContent = cleanBulletText(output);
                         outputsList.appendChild(li);
                     });
                     outputsBlock.appendChild(outputsList);
@@ -1112,7 +1279,7 @@
                     const missingList = document.createElement('ul');
                     summary.missingInformation.forEach(item => {
                         const li = document.createElement('li');
-                        li.textContent = item;
+                        li.textContent = cleanBulletText(item);
                         missingList.appendChild(li);
                     });
                     missingBlock.appendChild(missingList);
@@ -1148,7 +1315,7 @@
                     const questionsList = document.createElement('ul');
                     summary.suggestedNextQuestions.forEach(question => {
                         const li = document.createElement('li');
-                        li.textContent = question;
+                        li.textContent = cleanBulletText(question);
                         questionsList.appendChild(li);
                     });
                     questionsBlock.appendChild(questionsList);
@@ -1184,11 +1351,20 @@
                 return;
             }
             
+            // Prompt for document title
+            const documentTitle = prompt('Enter the SOP document title:', 'Standard Operating Procedure');
+            if (!documentTitle || documentTitle.trim() === '') {
+                return; // User cancelled or entered empty title
+            }
+            
             const generateBtn = document.getElementById('generate-btn');
             generateBtn.disabled = true;
             generateBtn.textContent = '⏳ Generating SOP...';
             
             try {
+                // Store document title in sessionStorage
+                sessionStorage.setItem('sopDocumentTitle', documentTitle.trim());
+                
                 // Redirect to SOP view page with session ID
                 window.location.href = `/sop-view.html?sessionId=${currentSessionId}`;
             } catch (error) {
@@ -1206,23 +1382,46 @@
 
         // Export SOP
         async function exportSOP(format) {
-            const sopContent = document.getElementById('sop-content').textContent;
+            // Get the stored SOP data
+            const sopData = sessionStorage.getItem('currentSOPData');
             
-            if (!sopContent) {
+            if (!sopData) {
                 showError('No SOP to export. Please generate an SOP first.');
                 return;
             }
             
+            const btnIds = {
+                'pdf': 'export-pdf-btn',
+                'docx': 'export-docx-btn',
+                'md': 'export-md-btn'
+            };
+            
+            const exportBtn = document.getElementById(btnIds[format]);
+            const originalText = exportBtn.textContent;
+            exportBtn.disabled = true;
+            exportBtn.textContent = `⏳ Exporting ${format.toUpperCase()}...`;
+            
             try {
-                const response = await fetch(`${API_BASE}/sop/export`, {
+                const sopId = sessionStorage.getItem('currentSOPId') || currentSessionId;
+                const parsedSOPData = JSON.parse(sopData);
+                
+                const response = await fetch(`${API_BASE}/sops/${sopId}/export`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify({
-                        content: sopContent,
-                        format: format
+                        format: format,
+                        sopData: parsedSOPData,
+                        options: {
+                            includeMetadata: true,
+                            headerFooter: {
+                                includeHeader: true,
+                                includeFooter: true
+                            },
+                            agentFormat: format === 'md' // Special flag for Agent.MD format
+                        }
                     })
                 });
                 
@@ -1231,17 +1430,32 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `sop-${Date.now()}.${format}`;
+                    
+                    // Set appropriate filename
+                    const title = parsedSOPData.title || 'SOP';
+                    const cleanTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+                    const extension = format === 'md' ? 'md' : format;
+                    a.download = `${cleanTitle}_v${parsedSOPData.version || '1.0'}.${extension}`;
+                    
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
+                    
+                    // Show success message
+                    const formatName = format === 'md' ? 'Agent.MD' : format.toUpperCase();
+                    addSystemMessage(`✅ SOP exported successfully as ${formatName}`);
                 } else {
-                    throw new Error('Export failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'Export failed');
                 }
             } catch (error) {
                 console.error('Export error:', error);
-                showError(`Failed to export SOP as ${format.toUpperCase()}. Please try again.`);
+                const formatName = format === 'md' ? 'Agent.MD' : format.toUpperCase();
+                showError(`Failed to export SOP as ${formatName}. Please try again.`);
+            } finally {
+                exportBtn.disabled = false;
+                exportBtn.textContent = originalText;
             }
         }
 
@@ -1289,6 +1503,315 @@
                 errorDiv.remove();
             }, 5000);
         }
+
+        // ========== VOICE RECORDING FUNCTIONS ==========
+
+        // Toggle voice recording
+        async function toggleVoiceRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        // Start recording
+        async function startRecording() {
+            try {
+                // Check if browser supports Web Speech API
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    startWebSpeechRecognition();
+                } else {
+                    // Fallback to MediaRecorder
+                    startMediaRecorderRecording();
+                }
+            } catch (error) {
+                console.error('Failed to start recording:', error);
+                showError('Failed to access microphone. Please check permissions.');
+            }
+        }
+
+        // Use Web Speech API (Free, browser-based)
+        function startWebSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            let finalTranscript = '';
+            
+            recognition.onstart = () => {
+                isRecording = true;
+                updateRecordingUI(true);
+                createWaveAnimation();
+                console.log('Web Speech Recognition started');
+            };
+            
+            // Store existing text before starting
+            const messageInput = document.getElementById('message-input');
+            const existingText = messageInput.value;
+            
+            // Position cursor at end of text
+            const endPosition = existingText.length;
+            messageInput.setSelectionRange(endPosition, endPosition);
+            messageInput.focus();
+            
+            const cursorPosition = endPosition;
+            
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                // Combine existing text with new transcription
+                const textBefore = existingText.substring(0, cursorPosition);
+                const textAfter = existingText.substring(cursorPosition);
+                const newText = textBefore + finalTranscript + interimTranscript + textAfter;
+                
+                messageInput.value = newText;
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
+                
+                // Auto-scroll to bottom of textarea as text is added
+                messageInput.scrollTop = messageInput.scrollHeight;
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                if (event.error !== 'no-speech') {
+                    showError('Speech recognition error: ' + event.error);
+                }
+                stopRecording();
+            };
+            
+            recognition.onend = () => {
+                isRecording = false;
+                updateRecordingUI(false);
+                removeWaveAnimation();
+                
+                const messageInput = document.getElementById('message-input');
+                if (messageInput.value.trim()) {
+                    document.getElementById('send-button').disabled = false;
+                }
+            };
+            
+            // Store recognition instance
+            window.currentRecognition = recognition;
+            recognition.start();
+        }
+
+        // Fallback: MediaRecorder recording
+        async function startMediaRecorderRecording() {
+            try {
+                // Request microphone access
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 48000
+                    } 
+                });
+                
+                // Create audio context for visualization
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                
+                // Create media recorder
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                audioChunks = [];
+                
+                // Handle data available
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                // Handle recording stop
+                mediaRecorder.onstop = async () => {
+                    await processRecording();
+                    
+                    // Stop all tracks
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Close audio context
+                    if (audioContext) {
+                        audioContext.close();
+                        audioContext = null;
+                    }
+                };
+                
+                // Start recording
+                mediaRecorder.start();
+                isRecording = true;
+                recordingStartTime = Date.now();
+                
+                // Update UI
+                updateRecordingUI(true);
+                
+                // Create wave animation
+                createWaveAnimation();
+                
+                // Start audio visualization
+                visualizeAudio();
+                
+                console.log('MediaRecorder recording started');
+                
+            } catch (error) {
+                console.error('Failed to start recording:', error);
+                showError('Failed to access microphone. Please check permissions.');
+            }
+        }
+
+        // Stop recording
+        function stopRecording() {
+            // Stop Web Speech Recognition
+            if (window.currentRecognition) {
+                window.currentRecognition.stop();
+                window.currentRecognition = null;
+            }
+            
+            // Stop MediaRecorder
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                // Update UI
+                updateRecordingUI(false);
+                
+                // Remove wave animation
+                removeWaveAnimation();
+                
+                // Stop visualization
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = null;
+                }
+                
+                console.log('Recording stopped');
+            }
+        }
+
+        // Process recording (only used for MediaRecorder fallback)
+        async function processRecording() {
+            try {
+                // Create blob from chunks
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                
+                console.log('Processing audio:', {
+                    size: audioBlob.size,
+                    type: audioBlob.type
+                });
+                
+                // Show processing message
+                addSystemMessage('🎤 Processing your voice input...');
+                
+                // Use mock transcription for fallback
+                // In production, this would call a free API like Vosk or Whisper
+                setTimeout(() => {
+                    const messageInput = document.getElementById('message-input');
+                    const mockText = 'Voice input captured. Please edit this text with your actual workflow description.';
+                    messageInput.value = mockText;
+                    messageInput.style.height = 'auto';
+                    messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
+                    
+                    // Enable send button
+                    document.getElementById('send-button').disabled = false;
+                    
+                    // Focus on input
+                    messageInput.focus();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Failed to process recording:', error);
+                showError('Failed to process recording. Please try again.');
+            }
+        }
+
+        // Update recording UI
+        function updateRecordingUI(recording) {
+            const micButton = document.getElementById('mic-button');
+            
+            if (recording) {
+                micButton.classList.add('recording');
+            } else {
+                micButton.classList.remove('recording');
+            }
+        }
+
+        // Create wave animation near microphone button
+        function createWaveAnimation() {
+            const inputWrapper = document.querySelector('.input-wrapper');
+            
+            // Create wave element
+            waveElement = document.createElement('div');
+            waveElement.className = 'voice-wave active';
+            waveElement.id = 'voice-wave';
+            
+            // Create wave bars
+            for (let i = 0; i < 5; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                waveElement.appendChild(bar);
+            }
+            
+            // Position is set by CSS (right: 4.5rem, bottom: 0.75rem)
+            // This places it between the mic button and send button
+            
+            inputWrapper.appendChild(waveElement);
+        }
+
+        // Remove wave animation
+        function removeWaveAnimation() {
+            if (waveElement) {
+                waveElement.remove();
+                waveElement = null;
+            }
+        }
+
+        // Visualize audio levels (for MediaRecorder fallback)
+        function visualizeAudio() {
+            if (!analyser || !isRecording) return;
+            
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average volume
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            
+            // Update wave bars based on audio level
+            if (waveElement) {
+                const bars = waveElement.querySelectorAll('.wave-bar');
+                bars.forEach((bar, index) => {
+                    const height = Math.max(10, Math.min(24, (average / 255) * 24 + Math.random() * 4));
+                    bar.style.height = `${height}px`;
+                });
+            }
+            
+            animationFrame = requestAnimationFrame(visualizeAudio);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (isRecording) {
+                stopRecording();
+            }
+        });
     </script>
 </body>
 </html>

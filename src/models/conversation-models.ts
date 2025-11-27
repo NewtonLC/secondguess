@@ -68,6 +68,7 @@ export interface AudioStream {
   channels: number;
   format: AudioFormat;
   timestamp: Date;
+  bitDepth?: number; // Bit depth of PCM data (8, 16, 24, or 32)
 }
 
 export interface AudioBuffer {
@@ -76,6 +77,7 @@ export interface AudioBuffer {
   channels: number;
   duration: number;
   format: AudioFormat;
+  bitDepth?: number; // Bit depth of PCM data (8, 16, 24, or 32)
 }
 
 export interface VoiceConfiguration {

@@ -15,6 +15,7 @@ import monitoringRoutes from './routes/monitoring';
 import dashboardRoutes from './routes/dashboard';
 import summarizationRoutes from './routes/summarization';
 import apiLogsRoutes from './routes/api-logs';
+import speechRoutes from './routes/speech';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
@@ -136,6 +137,11 @@ export function createApp(): Application {
     rateLimit(rateLimitConfigs.general), 
     routeSpecificMonitoring('logs'),
     apiLogsRoutes
+  );
+  app.use('/api/speech', 
+    rateLimit(rateLimitConfigs.general), 
+    routeSpecificMonitoring('speech'),
+    speechRoutes
   );
 
   // 404 handler for unmatched routes

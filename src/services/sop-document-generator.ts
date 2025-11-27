@@ -5,6 +5,7 @@
 
 import { SOPChartGenerator, GeneratedChart, ChartGenerationInput } from './sop-chart-generator';
 import { SOPTextGenerator, GeneratedSOPText, SOPTextInput } from './sop-text-generator';
+import { SOPImageGenerator, GeneratedImage, ImageGenerationInput } from './sop-image-generator';
 import { logger } from '../utils/logger';
 
 export interface CompleteSOPDocument {
@@ -19,6 +20,7 @@ export interface CompleteSOPDocument {
     title: string;
     subtitle: string;
     imagePrompt: string;
+    coverImage?: GeneratedImage;
   };
   tableOfContents: TableOfContentsEntry[];
   charts: GeneratedChart[];
@@ -35,10 +37,12 @@ export interface TableOfContentsEntry {
 export class SOPDocumentGenerator {
   private chartGenerator: SOPChartGenerator;
   private textGenerator: SOPTextGenerator;
+  private imageGenerator: SOPImageGenerator;
 
   constructor() {
     this.chartGenerator = new SOPChartGenerator();
     this.textGenerator = new SOPTextGenerator();
+    this.imageGenerator = new SOPImageGenerator();
     logger.info('SOP Document Generator initialized');
   }
 
@@ -73,14 +77,24 @@ export class SOPDocumentGenerator {
         dependencies: workflowData.dependencies || []
       };
 
-      // Generate charts and text in parallel
-      const [charts, sopText] = await Promise.all([
+      // Prepare image generation input
+      const imageInput: ImageGenerationInput = {
+        title: workflowData.title || 'Standard Operating Procedure',
+        description: workflowData.description || '',
+        industry: workflowData.industry || workflowData.category,
+        processType: workflowData.type || 'Business Process',
+        keywords: this.extractKeywords(workflowData)
+      };
+
+      // Generate charts, text, and cover image in parallel
+      const [charts, sopText, coverImage] = await Promise.all([
         this.chartGenerator.generateCharts(chartInput),
-        this.textGenerator.generateSOPText(textInput)
+        this.textGenerator.generateSOPText(textInput),
+        this.imageGenerator.generateCoverImage(imageInput)
       ]);
 
-      // Create cover page
-      const coverPage = this.generateCoverPage(sopText);
+      // Create cover page with generated image
+      const coverPage = this.generateCoverPage(sopText, coverImage);
 
       // Generate table of contents
       const tableOfContents = this.generateTableOfContents(sopText, charts);
@@ -143,19 +157,48 @@ export class SOPDocumentGenerator {
   }
 
   /**
-   * Generate cover page information
+   * Extract keywords from workflow data for image generation
    */
-  private generateCoverPage(sopText: GeneratedSOPText): {
+  private extractKeywords(workflowData: any): string[] {
+    const keywords: string[] = [];
+    
+    // From title
+    if (workflowData.title) {
+      keywords.push(...workflowData.title.toLowerCase().split(' ').filter((w: string) => w.length > 3));
+    }
+    
+    // From tags
+    if (workflowData.tags) {
+      keywords.push(...workflowData.tags);
+    }
+    
+    // From category
+    if (workflowData.category) {
+      keywords.push(workflowData.category);
+    }
+    
+    // Default keywords
+    if (keywords.length === 0) {
+      keywords.push('process', 'workflow', 'quality', 'efficiency');
+    }
+    
+    return [...new Set(keywords)].slice(0, 5); // Unique, max 5
+  }
+
+  /**
+   * Generate cover page information with AI-generated image
+   */
+  private generateCoverPage(sopText: GeneratedSOPText, coverImage: GeneratedImage): {
     title: string;
     subtitle: string;
     imagePrompt: string;
+    coverImage: GeneratedImage;
   } {
     return {
       title: sopText.title,
       subtitle: `Document No: ${sopText.documentNumber} | Version ${sopText.version}`,
-      imagePrompt: `Professional abstract background for a Standard Operating Procedure document about ${sopText.title}. 
-Modern, clean, corporate style with blue and gray tones. Geometric patterns suggesting organization and process flow. 
-High quality, suitable for business documentation.`
+      imagePrompt: coverImage.prompt,
+      coverImage: coverImage
     };
   }
 
@@ -168,26 +211,25 @@ High quality, suitable for business documentation.`
   ): TableOfContentsEntry[] {
     const toc: TableOfContentsEntry[] = [];
 
-    // Add charts section
-    if (charts.length > 0) {
-      const chartsEntry: TableOfContentsEntry = {
-        number: '0',
-        title: 'Process Diagrams',
-        subsections: charts.map((chart, index) => ({
-          number: `0.${index + 1}`,
-          title: chart.title
-        }))
-      };
-      toc.push(chartsEntry);
-    }
+    // Add charts section FIRST (always include, even if empty for consistency)
+    const chartsEntry: TableOfContentsEntry = {
+      number: '1',
+      title: 'Process Diagrams',
+      subsections: charts.length > 0 ? charts.map((chart, index) => ({
+        number: `1.${index + 1}`,
+        title: chart.title
+      })) : undefined
+    };
+    toc.push(chartsEntry);
 
-    // Add text sections
-    sopText.sections.forEach((section) => {
+    // Add text sections (renumber starting from 2)
+    sopText.sections.forEach((section, index) => {
+      const sectionNumber = index + 2; // Start from 2 since Process Diagrams is 1
       const entry: TableOfContentsEntry = {
-        number: section.number,
+        number: `${sectionNumber}`,
         title: section.title,
-        subsections: section.subsections ? section.subsections.map((sub: any) => ({
-          number: sub.number,
+        subsections: section.subsections ? section.subsections.map((sub: any, subIndex: number) => ({
+          number: `${sectionNumber}.${subIndex + 1}`,
           title: sub.title
         })) : undefined
       };
