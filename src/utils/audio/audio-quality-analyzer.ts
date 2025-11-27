@@ -45,7 +45,8 @@ export class AudioQualityAnalyzer {
   }
 
   private static analyzeRawAudio(audioStream: AudioStream): AudioQualityMetrics {
-    const samples = new Float32Array(audioStream.data);
+    // Convert audio data to normalized float samples based on bit depth
+    const samples = this.convertToFloatSamples(audioStream);
     
     // Calculate basic metrics
     const averageAmplitude = samples.reduce(
@@ -83,5 +84,95 @@ export class AudioQualityAnalyzer {
       silenceRatio,
       clippingDetected,
     };
+  }
+
+  /**
+   * Convert audio data to normalized float samples based on bit depth
+   * Handles 16-bit PCM (most common), 32-bit float, and 8-bit PCM
+   */
+  private static convertToFloatSamples(audioStream: AudioStream): Float32Array {
+    const data = audioStream.data;
+    const bitDepth = audioStream.bitDepth || 16; // Default to 16-bit if not specified
+    
+    try {
+      switch (bitDepth) {
+        case 32: {
+          // 32-bit float PCM - already in correct format
+          return new Float32Array(data);
+        }
+        
+        case 16: {
+          // 16-bit integer PCM - most common format
+          const int16Samples = new Int16Array(data);
+          const floatSamples = new Float32Array(int16Samples.length);
+          
+          // Normalize to -1.0 to 1.0 range
+          for (let i = 0; i < int16Samples.length; i++) {
+            const sample = int16Samples[i];
+            floatSamples[i] = (sample !== undefined ? sample : 0) / 32768.0;
+          }
+          
+          return floatSamples;
+        }
+        
+        case 8: {
+          // 8-bit unsigned PCM
+          const uint8Samples = new Uint8Array(data);
+          const floatSamples = new Float32Array(uint8Samples.length);
+          
+          // Normalize to -1.0 to 1.0 range (8-bit is typically unsigned, centered at 128)
+          for (let i = 0; i < uint8Samples.length; i++) {
+            const sample = uint8Samples[i];
+            floatSamples[i] = ((sample !== undefined ? sample : 128) - 128) / 128.0;
+          }
+          
+          return floatSamples;
+        }
+        
+        case 24: {
+          // 24-bit integer PCM (stored as 3 bytes per sample)
+          const uint8View = new Uint8Array(data);
+          const sampleCount = Math.floor(uint8View.length / 3);
+          const floatSamples = new Float32Array(sampleCount);
+          
+          // Read 24-bit samples and normalize to -1.0 to 1.0 range
+          for (let i = 0; i < sampleCount; i++) {
+            const offset = i * 3;
+            // Combine 3 bytes into a 24-bit signed integer (little-endian)
+            const byte0 = uint8View[offset] ?? 0;
+            const byte1 = uint8View[offset + 1] ?? 0;
+            const byte2 = uint8View[offset + 2] ?? 0;
+            let sample = byte0 | (byte1 << 8) | (byte2 << 16);
+            
+            // Convert to signed (if negative)
+            if (sample & 0x800000) {
+              sample |= ~0xFFFFFF;
+            }
+            
+            floatSamples[i] = sample / 8388608.0; // 2^23
+          }
+          
+          return floatSamples;
+        }
+        
+        default: {
+          logger.warn(`Unsupported bit depth: ${bitDepth}, defaulting to 16-bit interpretation`);
+          // Fall back to 16-bit interpretation
+          const int16Samples = new Int16Array(data);
+          const floatSamples = new Float32Array(int16Samples.length);
+          
+          for (let i = 0; i < int16Samples.length; i++) {
+            const sample = int16Samples[i];
+            floatSamples[i] = (sample !== undefined ? sample : 0) / 32768.0;
+          }
+          
+          return floatSamples;
+        }
+      }
+    } catch (error) {
+      logger.error('Error converting audio samples:', error);
+      // Return empty array on error
+      return new Float32Array(0);
+    }
   }
 }
