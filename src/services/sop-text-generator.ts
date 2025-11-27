@@ -120,11 +120,29 @@ Create a complete SOP document following ISO 9001 structure with these sections:
    - Accountability matrix
 
 ### PROCEDURE
-   - Detailed step-by-step instructions
-   - Prerequisites for each step
-   - Expected outcomes
-   - Decision points and criteria
-   - Quality checkpoints
+   CRITICAL FORMATTING REQUIREMENTS:
+   - Main steps MUST use format: "1. Step Title - Brief description"
+   - Number, title, dash, and description MUST be on ONE LINE
+   - Related sub-steps MUST use sub-numbering: 1.1, 1.2, 1.3 (NOT separate numbers)
+   - Sub-steps should be additional details or warnings related to the main step
+   - Each sub-step on its own line with proper numbering
+   
+   EXACT FORMAT TO FOLLOW:
+   
+   1. Prepare Materials - Gather all required materials and tools
+   1.1 Check material quality and expiration dates
+   1.2 Verify quantities match requirements
+   1.3 Organize materials in work area
+   
+   2. Execute Process - Follow the documented procedure
+   2.1 Monitor progress at each checkpoint
+   2.2 Record observations and measurements
+   2.3 Address any deviations immediately
+   
+   3. Complete Documentation - Record all results and observations
+   3.1 Fill out required forms
+   3.2 Sign and date all documents
+   3.3 File records in appropriate location
 
 ### REQUIRED RESOURCES
    - Materials and supplies
@@ -156,16 +174,33 @@ Create a complete SOP document following ISO 9001 structure with these sections:
     - Supporting documents
 
 ### REVISION HISTORY
-    - Version tracking
-    - Change log
+    - Create a table with columns: Version, Date, Description, Author
+    - Add ONE row: Version 1.0, today's date (${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}), Initial release, AI Voice SOP Agent
+    - Use markdown table format
 
 Requirements:
 - Use professional, clear, and concise language
 - Write in imperative mood for procedures (e.g., "Complete the form", not "The form should be completed")
 - Include specific details and avoid ambiguity
-- Use numbered lists for sequential steps (1. 2. 3.)
-- Use bullet points for non-sequential items (use - not *)
-- Maintain consistent formatting
+
+CRITICAL PROCEDURE FORMATTING (MUST FOLLOW EXACTLY):
+- Main steps: "1. Step Title - Brief description" (ALL on ONE line)
+- Sub-steps: Use sub-numbering "1.1", "1.2", "1.3" (NOT dashes, NOT separate numbers)
+- Sub-steps are additional details, warnings, or notes for the main step
+- Example:
+  1. Prepare Materials - Gather all required materials and tools
+  1.1 Check material quality and expiration dates
+  1.2 Verify quantities match requirements
+  1.3 Organize materials in work area
+  2. Execute Process - Follow the documented procedure
+  2.1 Monitor progress at each checkpoint
+  2.2 Record observations and measurements
+  2.3 Address any deviations immediately
+
+OTHER FORMATTING:
+- Use numbered lists (1. 2. 3.) for main sequential steps in PROCEDURE section
+- Use bullet points (use - not *) for non-sequential items and sub-details
+- Maintain consistent formatting throughout
 - Include quality checkpoints
 - Address potential issues and their solutions
 - DO NOT add numbers before section titles - they will be added automatically

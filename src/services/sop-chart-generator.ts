@@ -101,12 +101,14 @@ Requirements:
    - Diamond: nodeId{"Decision text?"}
    - Start/End: nodeId(["Label"])
 4. Use arrows: nodeId1 --> nodeId2
-5. Keep labels VERY SHORT (max 35 characters)
-6. NO special characters in labels except spaces and basic punctuation
+5. Keep labels VERY SHORT (max 30 characters)
+6. NO special characters in labels except spaces, hyphens, and periods
 7. NO line breaks within labels
-8. Include start and end nodes
-9. Keep it COMPACT - max 10 nodes total
-10. Combine similar steps if needed to keep diagram focused
+8. NO quotes within labels
+9. Include start and end nodes
+10. Keep it COMPACT - max 8 nodes total
+11. Combine similar steps if needed to keep diagram focused
+12. Use only alphanumeric characters and basic punctuation in node IDs
 
 Example format:
 flowchart TD
@@ -138,7 +140,7 @@ Return ONLY valid Mermaid code, no explanations or markdown blocks.`;
       title: 'Process Flowchart',
       description: 'Main process flow showing all steps and decision points',
       mermaidCode,
-      caption: `Figure 1: ${input.title} - Process Flowchart`
+      caption: `Complete process flow with all steps and decision points`
     };
   }
 
@@ -158,37 +160,43 @@ ACTORS: ${input.actors?.join(', ')}
 STEPS:
 ${input.steps.map((step, i) => `${i + 1}. ${step.description || step.title || step}${step.actor ? ` (Actor: ${step.actor})` : ''}`).join('\n')}
 
-Requirements:
+CRITICAL Requirements - MUST FOLLOW EXACTLY:
 1. Use ONLY Mermaid flowchart syntax: flowchart TD
-2. Use subgraph for EACH actor/role as a swimlane
-3. Each subgraph represents ONE actor's lane
-4. Simple node IDs without spaces (e.g., a1, a2, b1, b2)
-5. Short labels (max 35 characters)
-6. Use this EXACT syntax:
-   - subgraph "Actor Name"
-   - direction TB
-   - nodeId["Action"]
-   - end
-7. Connect nodes across subgraphs with arrows
-8. Keep it COMPACT - max 8 steps total
+2. Create ONE subgraph for EACH actor/role
+3. ALL tasks for the SAME actor MUST be inside the SAME subgraph
+4. List ALL nodes for an actor VERTICALLY inside their subgraph (one per line)
+5. DO NOT connect nodes within the same subgraph - they stack automatically
+6. ONLY connect nodes BETWEEN different subgraphs
+7. Subgraphs will appear side-by-side, tasks stack top-to-bottom
+8. Simple node IDs (emp1, emp2, mgr1, mgr2)
+9. Short labels (max 35 characters)
+10. Keep it SIMPLE - 2-4 tasks per actor, max 3 actors
 
-Example format:
+EXACT FORMAT - COPY THIS STRUCTURE:
 flowchart TD
-    subgraph "Manager"
-        direction TB
-        a1["Review request"]
-        a2["Make decision"]
-    end
-    
     subgraph "Employee"
-        direction TB
-        b1["Submit request"]
-        b2["Receive feedback"]
+        emp1["Submit request"]
+        emp2["Provide info"]
+        emp3["Receive result"]
     end
     
-    b1 --> a1
-    a1 --> a2
-    a2 --> b2
+    subgraph "Manager"
+        mgr1["Review request"]
+        mgr2["Make decision"]
+        mgr3["Send approval"]
+    end
+    
+    emp1 --> mgr1
+    mgr1 --> emp2
+    emp2 --> mgr2
+    mgr2 --> mgr3
+    mgr3 --> emp3
+
+IMPORTANT: 
+- Each actor = ONE subgraph
+- All actor's tasks listed inside their subgraph
+- Tasks automatically stack vertically
+- Only connect BETWEEN subgraphs, not within
 
 Return ONLY valid Mermaid code, no explanations.`;
 
@@ -201,9 +209,9 @@ Return ONLY valid Mermaid code, no explanations.`;
     return {
       type: 'swimlane',
       title: 'Roles and Responsibilities',
-      description: 'Swimlane diagram showing which role performs each step',
+      description: 'Shows which role performs each action in the process',
       mermaidCode,
-      caption: `Figure 2: ${input.title} - Roles and Responsibilities`
+      caption: `Swimlane showing role responsibilities`
     };
   }
 
@@ -266,7 +274,7 @@ Return ONLY valid Mermaid code, no explanations or markdown.`;
       title: 'Input-Process-Output Diagram',
       description: 'Shows the flow of information from inputs through processing to outputs',
       mermaidCode,
-      caption: `Figure 3: ${input.title} - Input-Process-Output Flow`
+      caption: `Data flow from inputs through processing to final outputs`
     };
   }
 

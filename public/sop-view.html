@@ -117,51 +117,77 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ffffff;
+            color: #1a1a1a;
             padding: 4rem;
             position: relative;
             overflow: hidden;
+            border-bottom: 4px solid #667eea;
         }
 
         .cover-page::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></linearGradient></defs><path d="M0,400 Q300,200 600,400 T1200,400 L1200,800 L0,800 Z" fill="url(%23grad)"/></svg>');
-            background-size: cover;
-            opacity: 0.3;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .cover-page.has-custom-image::before {
+            background-image: var(--cover-image-url);
+        }
+        
+        .cover-page.no-custom-image::before {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjYwMCIgdmlld0JveD0iMCAwIDYwMCA2MDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjwhLS0gT3V0ZXIgQ2lyY2xlIC0tPgo8Y2lyY2xlIGN4PSIzMDAiIGN5PSIzMDAiIHI9IjI4MCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMTUiLz4KPGNpcmNsZSBjeD0iMzAwIiBjeT0iMzAwIiByPSIyNDAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBvcGFjaXR5PSIwLjEiLz4KPGNpcmNsZSBjeD0iMzAwIiBjeT0iMzAwIiByPSIyMDAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBvcGFjaXR5PSIwLjA4Ii8+CjwhLS0gQ2hlY2ttYXJrIC0tPgo8cGF0aCBkPSJNMjAwIDMwMEwyNTAgMzUwTDQwMCAyMDAiIHN0cm9rZT0iIzY2N2VlYSIgc3Ryb2tlLXdpZHRoPSIyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIwLjEyIi8+CjwhLS0gRG9jdW1lbnQgSWNvbiAtLT4KPHJlY3QgeD0iMTgwIiB5PSIxNDAiIHdpZHRoPSIxNDAiIGhlaWdodD0iMTgwIiByeD0iOCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMDgiLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjE4MCIgeDI9IjMwMCIgeTI9IjE4MCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMDgiLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjIyMCIgeDI9IjMwMCIgeTI9IjIyMCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMDgiLz4KPGxpbmUgeDE9IjIwMCIgeTE9IjI2MCIgeDI9IjI4MCIgeTI9IjI2MCIgc3Ryb2tlPSIjNjY3ZWVhIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMDgiLz4KPC9zdmc+');
         }
 
         .cover-content {
             position: relative;
             z-index: 1;
+            max-width: 800px;
         }
 
         .cover-title {
             font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: #1a1a1a;
+            line-height: 1.2;
         }
 
         .cover-subtitle {
             font-size: 1.5rem;
-            font-weight: 300;
+            font-weight: 400;
             margin-bottom: 3rem;
-            opacity: 0.95;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .cover-metadata {
             font-size: 1.1rem;
-            opacity: 0.9;
+            color: #4b5563;
+            background: rgba(102, 126, 234, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
         .cover-metadata div {
-            margin: 0.5rem 0;
+            margin: 0.75rem 0;
+        }
+
+        .cover-metadata strong {
+            color: #667eea;
+            font-weight: 600;
         }
 
         /* Table of Contents */
@@ -181,6 +207,7 @@
 
         .toc-list {
             list-style: none;
+            counter-reset: toc-counter 0;
         }
 
         .toc-item {
@@ -201,10 +228,12 @@
             color: #667eea;
             margin-right: 1rem;
             min-width: 3rem;
+            white-space: nowrap;
         }
 
         .toc-title-text {
             flex: 1;
+            margin-left: 0.5rem;
         }
 
         .toc-subsection {
@@ -241,23 +270,24 @@
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
+            padding: 2rem;
+            margin: 1.5rem 0;
             overflow-x: auto;
-            max-height: 800px;
+            min-height: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .chart-diagram .mermaid {
-            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
         }
 
         .chart-diagram svg {
-            max-width: 100% !important;
-            max-height: 700px !important;
+            width: 100% !important;
+            min-height: 400px !important;
+            max-height: 1000px !important;
             height: auto !important;
         }
 
@@ -329,11 +359,36 @@
             font-weight: 600;
         }
 
+        /* Nested list indentation */
+        .section-content ul ul,
+        .section-content ol ol,
+        .section-content ul ol,
+        .section-content ol ul {
+            margin: 0.5rem 0 0.5rem 1.5rem;
+        }
+
+        .section-content ul ul {
+            list-style-type: circle;
+        }
+
+        .section-content ul ul ul {
+            list-style-type: square;
+        }
+
+        .section-content ol ol {
+            list-style-type: lower-alpha;
+        }
+
+        .section-content ol ol ol {
+            list-style-type: lower-roman;
+        }
+
         .sop-table {
             width: 100%;
             border-collapse: collapse;
             margin: 1.5rem 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            table-layout: fixed;
         }
 
         .sop-table th,
@@ -341,6 +396,8 @@
             border: 1px solid #e5e7eb;
             padding: 0.75rem 1rem;
             text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .sop-table th {
@@ -627,11 +684,25 @@
         function renderSOPDocument(sop) {
             const container = document.getElementById('document');
             
+            // Debug logging
+            console.log('SOP Data:', sop);
+            console.log('Cover Page:', sop.coverPage);
+            console.log('Cover Image:', sop.coverPage?.coverImage);
+            
+            // Get custom document title from sessionStorage if available
+            const customTitle = sessionStorage.getItem('sopDocumentTitle') || sop.metadata.title;
+            
+            // Check if there's a custom cover image
+            const hasCoverImage = sop.coverPage && sop.coverPage.coverImage && sop.coverPage.coverImage.imageData;
+            const coverImageClass = hasCoverImage ? 'has-custom-image' : 'no-custom-image';
+            
+            console.log('Has Cover Image:', hasCoverImage);
+            
             // Cover Page
             let html = `
-                <div class="cover-page page-break">
+                <div class="cover-page page-break ${coverImageClass}" ${hasCoverImage ? `style="--cover-image-url: url('data:${sop.coverPage.coverImage.mimeType};base64,${sop.coverPage.coverImage.imageData}')"` : ''}>
                     <div class="cover-content">
-                        <div class="cover-title">${sop.metadata.title}</div>
+                        <div class="cover-title">${customTitle}</div>
                         <div class="cover-subtitle">Standard Operating Procedure</div>
                         <div class="cover-metadata">
                             <div><strong>Document Number:</strong> ${sop.metadata.documentNumber}</div>
@@ -649,18 +720,43 @@
                     <ul class="toc-list">
             `;
 
-            sop.tableOfContents.forEach(entry => {
+            // Check if Process Diagrams is already in TOC
+            const hasProcessDiagramsInTOC = sop.tableOfContents && sop.tableOfContents.some(entry => 
+                entry.title === 'Process Diagrams' || entry.number === '0'
+            );
+
+            // Add Process Diagrams to TOC if charts exist and not already in TOC
+            if (sop.charts && sop.charts.length > 0 && !hasProcessDiagramsInTOC) {
                 html += `
                     <li class="toc-item">
-                        <span class="toc-number">${entry.number}</span>
+                        <span class="toc-number">1</span>
+                        <span class="toc-title-text">Process Diagrams</span>
+                    </li>
+                `;
+            }
+
+            // Add other sections with adjusted numbering
+            sop.tableOfContents.forEach(entry => {
+                // Skip if this is Process Diagrams (number 0) since we handle it separately
+                if (entry.number === '0' || entry.title === 'Process Diagrams') {
+                    return;
+                }
+                
+                const adjustedNumber = sop.charts && sop.charts.length > 0 ? parseInt(entry.number) + 1 : entry.number;
+                html += `
+                    <li class="toc-item">
+                        <span class="toc-number">${adjustedNumber}</span>
                         <span class="toc-title-text">${entry.title}</span>
                     </li>
                 `;
                 if (entry.subsections) {
                     entry.subsections.forEach(sub => {
+                        const adjustedSubNumber = sop.charts && sop.charts.length > 0 
+                            ? `${adjustedNumber}.${sub.number.split('.')[1]}` 
+                            : sub.number;
                         html += `
                             <li class="toc-item toc-subsection">
-                                <span class="toc-number">${sub.number}</span>
+                                <span class="toc-number">${adjustedSubNumber}</span>
                                 <span class="toc-title-text">${sub.title}</span>
                             </li>
                         `;
@@ -673,44 +769,65 @@
                 </div>
             `;
 
-            // Charts Section
+            // Charts Section with Section Number 1
             if (sop.charts && sop.charts.length > 0) {
-                html += `<div class="charts-section page-break">`;
+                html += `<div class="content-section">`;
+                html += `
+                    <div class="section">
+                        <div class="section-number">1</div>
+                        <h2 class="section-title">Process Diagrams</h2>
+                        <div class="charts-section">
+                `;
                 
                 sop.charts.forEach((chart, index) => {
+                    const chartNumber = index + 1; // Start from 1, not 0
                     html += `
                         <div class="chart-container">
-                            <h2 class="chart-title">${chart.title}</h2>
+                            <h3 class="chart-title">Diagram ${chartNumber}: ${chart.title}</h3>
                             <p class="chart-description">${chart.description}</p>
                             <div class="chart-diagram">
                                 <div class="mermaid" id="chart-${index}">
 ${chart.mermaidCode}
                                 </div>
                             </div>
-                            <p class="chart-caption">${chart.caption}</p>
+                            <p class="chart-caption">Diagram ${chartNumber} - ${chart.caption}</p>
                         </div>
                     `;
                 });
                 
+                html += `
+                        </div>
+                    </div>
+                `;
                 html += `</div>`;
             }
 
-            // Content Sections
-            html += `<div class="content-section">`;
+            // Content Sections (adjust numbering to start after Process Diagrams)
+            if (!sop.charts || sop.charts.length === 0) {
+                html += `<div class="content-section">`;
+            }
             
-            sop.sections.forEach(section => {
+            sop.sections.forEach((section, sectionIndex) => {
+                // Adjust section number to account for Process Diagrams section
+                const adjustedNumber = sop.charts && sop.charts.length > 0 ? parseInt(section.number) + 1 : section.number;
+                
                 html += `
                     <div class="section">
-                        <div class="section-number">${section.number}</div>
+                        <div class="section-number">${adjustedNumber}</div>
                         <h2 class="section-title">${section.title}</h2>
                         <div class="section-content">${formatContent(section.content)}</div>
                 `;
                 
                 if (section.subsections) {
                     section.subsections.forEach(subsection => {
+                        // Adjust subsection number
+                        const adjustedSubNumber = sop.charts && sop.charts.length > 0 
+                            ? `${adjustedNumber}.${subsection.number.split('.')[1]}` 
+                            : subsection.number;
+                        
                         html += `
                             <div class="subsection">
-                                <div class="subsection-number">${subsection.number}</div>
+                                <div class="subsection-number">${adjustedSubNumber}</div>
                                 <h3 class="subsection-title">${subsection.title}</h3>
                                 <div class="section-content">${formatContent(subsection.content)}</div>
                             </div>

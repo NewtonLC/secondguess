@@ -30,7 +30,8 @@ router.get('/', authenticateUser, async (req: Request, res: Response) => {
       hasError,
       messageHash,
       limit = '100',
-      offset = '0'
+      offset = '0',
+      deduplicate = 'false'
     } = req.query;
 
     const filter: ApiLogFilter = {};
@@ -49,11 +50,24 @@ router.get('/', authenticateUser, async (req: Request, res: Response) => {
       logger.info('Filtering logs by messageHash', { messageHash: filter.messageHash });
     }
 
-    const logs = apiLoggerService.getLogs(
+    let logs = apiLoggerService.getLogs(
       filter,
       parseInt(limit as string),
       parseInt(offset as string)
     );
+
+    // Deduplicate if requested
+    if (deduplicate === 'true') {
+      const seen = new Set<string>();
+      logs = logs.filter(log => {
+        const key = `${log.method}:${log.endpoint}:${log.statusCode}`;
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return true;
+      });
+    }
 
     const totalCount = apiLoggerService.getLogCount(filter);
 
